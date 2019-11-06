@@ -1,12 +1,14 @@
 FROM node:10-alpine
 
-WORKDIR /app/usr
+# work directory
+WORKDIR /usr/app
 
 # Copy dependencies first for effective caching
 COPY package*.json ./
 
-RUN npm install
+RUN npm install -g nodemon \
+ && npm install
 
 COPY . .
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]

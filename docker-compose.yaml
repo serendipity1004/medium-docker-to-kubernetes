@@ -1,10 +1,50 @@
 version: '3'
 services:
+  nginx:
+    restart: always
+    build:
+      # 이렇게 작성하는 방법도 있습니다.
+      # Path만 정의하면 기본 도커파일이 Dockerfile로
+      # 지정이되고 dockerfile을 따로 이름을 정해주면
+      # 해당 파일이 빌드할때 사용되게 됩니다.
+      # production 이랑 staging 그리고 development 빌드
+      # 파일들을 전부 다른 파일로 정의하고 싶을경우 유용합니다.
+      dockerfile: Dockerfile
+      context: ./Nginx
+    volumes:
+      # Nginx에서 생성된 로그를 호스트 기기와
+      # 볼륨 쉐어링 하는 부분입니다.
+      - ./Nginx/logs:/var/log/nginx
+    ports:
+      - '8080:80'
+
   mongodb:
     build: ./Mongodb
     ports:
       - "${MONGO_PORT}:27017"
     volumes:
       - ./Mongodb/data:/data/db
+    env_file:
+      - .env
+
+  polling_server:
+    build: ./PollingServer
+    ports:
+      - "${POLLING_SERVER_PORT}:3000"
+    volumes:
+      - /usr/app/node_modules
+      - ./PollingServer:/usr/app
+      - ./Shared/mongoose:/usr/app/src/mongoose
+    env_file:
+      - .env
+
+  express_server:
+    build: ExpressServer
+    ports:
+      - "${EXPRESS_SERVER_PORT}:3000"
+    volumes:
+      - /usr/app/node_modules
+      - ./ExpressServer:/usr/app
+      - ./Shared/mongoose:/usr/app/src/mongoose
     env_file:
       - .env
