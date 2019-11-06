@@ -48,3 +48,16 @@ services:
       - ./Shared/mongoose:/usr/app/src/mongoose
     env_file:
       - .env
+
+  react_front:
+    build: ReactFront
+    ports:
+      - "${REACT_FRONT_PORT}:3000"
+    volumes:
+      - /usr/app/node_modules
+      - ./ReactFront:/usr/app
+    env_file:
+      - .env
+
+  redis:
+    image: redis:5
